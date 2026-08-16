@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Free Weather Anywhere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">🌤️ Weather App</div>
+            <p class="tagline">Get current weather for any city - <strong>FREE</strong> (No API Key Required!)</p>
+        </header>
+
+        <!-- Search Form -->
+        <section class="search-section">
+            <form method="POST" action="/" class="weather-form">
+                <div class="input-group">
+                    <input type="text" 
+                           name="city" 
+                           placeholder="Enter city name (e.g., London, Tokyo, New York)"
+                           value="{{ city if city else '' }}"
+                           required
+                           autofocus>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Search</span>
+                        <span class="btn-icon">🔍</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Error Message -->
+        {% if error %}
+        <div class="error-box">
+            <span class="error-icon">⚠️</span>
+            <div class="error-content">
+                <strong>Oops!</strong>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Weather Result -->
+        {% if weather %}
+        <section class="weather-result">
+            <div class="weather-card">
+                <!-- Weather Header -->
+                <div class="weather-header">
+                    <div class="city-details">
+                        <h2>{{ weather.city }}, {{ weather.country }}</h2>
+                        <p class="description">{{ weather.description }}</p>
+                    </div>
+                    <div class="weather-icon">
+                        <!-- Using weather code to show appropriate emoji -->
+                        {% set code = weather.icon|int %}
+                        {% if code >= 200 and code < 300 %}
+                            ⛈️
+                        {% elif code >= 300 and code < 400 %}
+                            🌧️
+                        {% elif code >= 500 and code < 600 %}
+                            🌧️
+                        {% elif code >= 600 and code < 700 %}
+                            ❄️
+                        {% elif code >= 700 and code < 800 %}
+                            🌫️
+                        {% elif code == 800 %}
+                            ☀️
+                        {% elif code == 801 %}
+                            🌤️
+                        {% elif code >= 802 and code < 900 %}
+                            ☁️
+                        {% else %}
+                            🌡️
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Temperature -->
+                <div class="temperature-section">
+                    <div class="temp-main">
+                        <span class="temp-value">{{ weather.temperature }}</span>
+                        <span class="temp-unit">°C</span>
+                    </div>
+                    <div class="temp-feels-like">Feels like {{ weather.feels_like }}°C</div>
+                </div>
+
+                <!-- Weather Details Grid -->
+                <div class="weather-details-grid">
+                    <div class="detail-card">
+                        <div class="detail-icon">💧</div>
+                        <div class="detail-info">
+                            <span class="detail-label">Humidity</span>
+                            <span class="detail-value">{{ weather.humidity }}%</span>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">💨</div>
+                        <div class="detail-info">
+                            <span class="detail-label">Wind Speed</span>
+                            <span class="detail-value">{{ weather.wind_speed }} km/h</span>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🌡️</div>
+                        <div class="detail-info">
+                            <span class="detail-label">Feels Like</span>
+                            <span class="detail-value">{{ weather.feels_like }}°C</span>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">🕐</div>
+                        <div class="detail-info">
+                            <span class="detail-label">Updated</span>
+                            <span class="detail-value">{{ weather.timestamp }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cache Information -->
+                <div class="cache-info">
+                    <div class="source-badge {% if weather.source == 'Cache' %}cache{% else %}fresh{% endif %}">
+                        {{ weather.source }}
+                    </div>
+                    <div class="cache-note">
+                        {{ weather.cache_note }}
+                    </div>
+                    {% if weather.source == 'Cache' %}
+                    <div class="cache-time">
+                        🕒 Cached at: {{ weather.cached_time }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="weather-actions">
+                    <a href="/clear-cache/{{ weather.city }}" class="btn btn-secondary">
+                        🗑️ Clear Cache for {{ weather.city }}
+                    </a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Quick Demo Cities -->
+        <section class="demo-section">
+            <h3>⚡ Quick Try</h3>
+            <p class="demo-subtitle">Click any city to check weather instantly</p>
+            <div class="demo-buttons">
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="London">
+                    <button type="submit" class="btn btn-demo">🇬🇧 London</button>
+                </form>
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="Tokyo">
+                    <button type="submit" class="btn btn-demo">🇯🇵 Tokyo</button>
+                </form>
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="New York">
+                    <button type="submit" class="btn btn-demo">🇺🇸 New York</button>
+                </form>
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="Sydney">
+                    <button type="submit" class="btn btn-demo">🇦🇺 Sydney</button>
+                </form>
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="Paris">
+                    <button type="submit" class="btn btn-demo">🇫🇷 Paris</button>
+                </form>
+                <form method="POST" action="/" class="inline-form">
+                    <input type="hidden" name="city" value="Mumbai">
+                    <button type="submit" class="btn btn-demo">🇮🇳 Mumbai</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>💡 Weather data is cached for 10 minutes to reduce API calls</p>
+                <p>🌐 Powered by <strong>wttr.in</strong> - Free weather API (No registration required!)</p>
+                <div class="footer-links">
+                    <a href="/clear-all-cache" class="btn btn-link">Clear All Cache</a>
+                    <a href="https://wttr.in" target="_blank" class="btn btn-link">API Source</a>
+                </div>
+                <p class="footer-note">Made with ❤️ using Flask</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
